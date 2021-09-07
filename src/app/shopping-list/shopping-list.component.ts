@@ -1,7 +1,9 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { Observable, Subscription } from 'rxjs';
 import { Ingredient } from '../shared/ingredient.model';
-import { ShoppingListService } from './shopping-list.service';
+import { StartEditing } from './store/shopping-list.actions';
+import * as fromApp from '../store/app.reducer'
 
 @Component({
   selector: 'app-shopping-list',
@@ -9,25 +11,27 @@ import { ShoppingListService } from './shopping-list.service';
   styleUrls: ['./shopping-list.component.css']
 })
 export class ShoppingListComponent implements OnInit, OnDestroy {
-  ingredients: Ingredient[] = [];
+  ingredients:Observable<{ingredients: Ingredient[]}>;
   private subscription: Subscription;
-  constructor(private slService:ShoppingListService) { }
+  constructor(private store: Store<fromApp.AppState>) { }
 
   ngOnInit(): void {
-    this.ingredients = this.slService.getIngredients();
-    this.subscription = this.slService.ingredientsChanged.subscribe(
-      (ingrs:Ingredient[])=>{
-        this.ingredients = ingrs;
-      }
-    )
+    this.ingredients = this.store.select('shoppingList');
+    // this.ingredients = this.slService.getIngredients();
+    // this.subscription = this.slService.ingredientsChanged.subscribe(
+    //   (ingrs: Ingredient[]) => {
+    //     this.ingredients = ingrs;
+    //   }
+    // )
   }
 
   //destroying observable(subject) to aoid memory leaks !important
-  ngOnDestroy():void{
-    this.subscription.unsubscribe();
+  ngOnDestroy(): void {
+    // this.subscription.unsubscribe();
   }
 
-  onEditItem(id:number){
-    this.slService.startedEdtiting.next(id);
+  onEditItem(id: number) {
+    // this.slService.startedEdtiting.next(id);
+    this.store.dispatch(new StartEditing(id));
   }
 }

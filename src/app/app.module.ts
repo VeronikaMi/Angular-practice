@@ -7,6 +7,14 @@ import { HeaderComponent } from './header/header.component';
 import { AppRoutingModule } from './app-routing.module';
 import { SharedModule } from './shared/shared.module';
 import { CoreModule } from './core.module';
+import { StoreModule } from '@ngrx/store';
+import { StoreDevtoolsModule } from "@ngrx/store-devtools";
+import { AppReducer } from './store/app.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './auth/store/auth.effects';
+import { environment } from 'src/environments/environment';
+import { StoreRouterConnectingModule } from '@ngrx/router-store';
+import { RecipesEffects } from './recipes/store/recipes.effects';
 
 @NgModule({
   declarations: [
@@ -22,6 +30,11 @@ import { CoreModule } from './core.module';
     BrowserModule,
     // FormsModule,
     CoreModule,
+    // StoreModule.forRoot({shoppingList : SLReducer}), //adding reducers
+    StoreModule.forRoot(AppReducer),
+    EffectsModule.forRoot([AuthEffects, RecipesEffects]),
+    StoreDevtoolsModule.instrument({logOnly:environment.production}),
+    StoreRouterConnectingModule.forRoot(),
     AppRoutingModule,
     HttpClientModule, //service
     // ReactiveFormsModule, do not need it anymore
